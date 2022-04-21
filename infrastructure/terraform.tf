@@ -5,6 +5,11 @@ terraform {
             source = "heroku/heroku"
             version = "4.8.0"
         }
+
+        herokux = {
+          source = "davidji99/herokux"
+          version = "0.33.0"
+        }
     }
 
     backend "remote" {
@@ -20,5 +25,9 @@ terraform {
 
 provider "heroku" {
   email = var.heroku_email
+  api_key = var.heroku_api_key
+}
+
+provider "herokux" {
   api_key = var.heroku_api_key
 }
