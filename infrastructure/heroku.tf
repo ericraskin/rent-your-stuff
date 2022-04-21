@@ -9,7 +9,7 @@ resource "heroku_app" "eraskin-rys-staging" {
 }
 
 resource "heroku_addon" "eraskin-rys-staging-db" {
-  name = heroku_app.eraskin-rys-staging.id
+  app = heroku_app.eraskin-rys-staging.id
   plan = "heroku-postgresql:hobby-dev"
 }
 
