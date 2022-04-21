@@ -1,5 +1,5 @@
-resource "heroku_app" "eraskin-rent-your-stuff-staging" {
-  name = "eraskin-rent-your-stuff-staging"
+resource "heroku_app" "eraskin-rys-staging" {
+  name = "eraskin-rys-staging"
   region = "us"
 
   buildpacks = [
