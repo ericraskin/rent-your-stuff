@@ -1,9 +1,9 @@
-variable "heroku_email" {
+variable "HEROKU_EMAIL" {
   type = string
   sensitive = true
 }
 
-variable "heroku_api_key" {
+variable "HEROKU_API_KEY" {
   type = string
   sensitive = true
 }
