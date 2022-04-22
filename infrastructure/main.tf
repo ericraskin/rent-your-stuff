@@ -12,6 +12,8 @@ resource "heroku_addon" "eraskin-rys-staging-db" {
   plan = "heroku-postgresql:hobby-dev"
 }
 
+/*
+
 resource "heroku_pipeline" "eraskin-rys-pipeline" {
   name = "eraskin-rys-pipeline"
 }
@@ -34,3 +36,5 @@ resource "herokux_app_github_integration" "eraskin-rys-gh-integration" {
   wait_for_ci = true
   depends_on  = [herokux_pipeline_github_integration.pipeline_integration]
 }
+
+*/

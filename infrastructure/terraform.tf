@@ -24,10 +24,10 @@ terraform {
 }
 
 provider "heroku" {
-  email   = var.heroku_email
-  api_key = var.heroku_api_key
+  email   = var.HEROKU_EMAIL
+  api_key = var.HEROKU_API_KEY
 }
 
 provider "herokux" {
-  api_key = var.heroku_api_key
+  api_key = var.HEROKU_API_KEY
 }
