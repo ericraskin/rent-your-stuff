@@ -15,7 +15,7 @@ terraform {
   backend "remote" {
     organization = "eraskin-rent-your-stuff"
 
-    workspaces = {
+    workspaces {
       name = "rent-your-stuff"
     }
   }
