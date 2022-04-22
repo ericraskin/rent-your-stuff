@@ -25,7 +25,7 @@ resource "heroku_pipeline_coupling" "staging_pipeline_coupling" {
 
 resource "herokux_pipeline_github_integration" "pipeline_integration" {
   pipeline_id = heroku_pipeline.eraskin-rys-pipeline.id
-  org_repo = "ericraskin/eraskin-rent-your-stuff"
+  org_repo = "ericraskin/rent-your-stuff"
 }
 
 resource "herokux_app_github_integration" "eraskin-rys-gh-integration" {
