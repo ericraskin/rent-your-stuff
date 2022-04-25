@@ -12,7 +12,7 @@ resource "heroku_build" "eraskin-rsys-staging" {
   app_id     = heroku_app.eraskin-rys-staging.id
   buildpacks = ["heroku/gradle"]
   source {
-    source   = "./app"
+    url      = "https://github.com/ericraskin/rent-your-stuff/archive/refs/heads/master.zip"
   }
 }
 
