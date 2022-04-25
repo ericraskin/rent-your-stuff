@@ -4,7 +4,7 @@ resource "heroku_app" "eraskin-rys-staging" {
 }
 
 resource "heroku_addon" "eraskin-rys-staging-db" {
-  app        = heroku_app.eraskin-rys-staging.id
+  app_id     = heroku_app.eraskin-rys-staging.id
   plan       = "heroku-postgresql:hobby-dev"
 }
 
