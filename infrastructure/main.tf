@@ -1,17 +1,32 @@
 resource "heroku_app" "eraskin-rys-staging" {
-  name = "eraskin-rys-staging"
-  region = "us"
-
-  buildpacks = [
-    "heroku/gradle"
-  ]
+  name        = "eraskin-rys-staging"
+  region      = "us"
 }
 
 resource "heroku_addon" "eraskin-rys-staging-db" {
-  app  = heroku_app.eraskin-rys-staging.id
-  plan = "heroku-postgresql:hobby-dev"
+  app_id     = heroku_app.eraskin-rys-staging.id
+  plan       = "heroku-postgresql:hobby-dev"
 }
 
+resource "heroku_build" "eraskin-rsys-staging" {
+  app_id     = heroku_app.eraskin-rys-staging.id
+  buildpacks = ["heroku/gradle"]
+  source {
+    url      = "https://github.com/ericraskin/rent-your-stuff/archive/refs/heads/master.zip"
+  }
+}
+
+resource "heroku_formation" "eraskin-rsys-staging" {
+  app_id     = heroku_app.eraskin-rys-staging.id
+  type       = "web"
+  quantity   = 1
+  size       = "Standard-1x"
+  depends_on = [heroku_build.eraskin-rsys-staging]
+}
+
+output "app_url" {
+  value       = "https://${heroku_app.eraskin-rys-staging.name}.herokuapp.com"
+}
 /*
 
 resource "heroku_pipeline" "eraskin-rys-pipeline" {
