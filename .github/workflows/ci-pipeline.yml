@@ -38,9 +38,11 @@ jobs:
           java-package: jdk
 
       - name: Make gradlew executable
+        working-directory: ./app
         run: chmod +x ./gradlew
 
       - name: Run tests
+        working-directory: ./app
         env:
           MAIN_DATASOURCE_URL: jdbc:postgresql://postgres:5432/rent_your_stuff
           MAIN_DATASOURCE_USERNAME: db_user
@@ -48,6 +50,7 @@ jobs:
         run: ./gradlew test
 
       - name: Publish Test Report
+        working-directory: ./app
         uses: mikepenz/action-junit-report@v2
         if: always()
         with:
