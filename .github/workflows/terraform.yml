@@ -8,6 +8,8 @@ jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
+    env:
+      TF_LOG_PROVIDER: DEBUG
     steps:
 
       - name: Checkout
