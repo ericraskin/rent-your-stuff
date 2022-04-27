@@ -8,6 +8,8 @@ resource "heroku_addon" "eraskin-rys-staging-db" {
   plan       = "heroku-postgresql:hobby-dev"
 }
 
+/* EHR version
+
 resource "heroku_build" "eraskin-rsys-staging" {
   app_id     = heroku_app.eraskin-rys-staging.id
   buildpacks = ["heroku/gradle"]
@@ -27,7 +29,9 @@ resource "heroku_formation" "eraskin-rsys-staging" {
 output "app_url" {
   value       = "https://${heroku_app.eraskin-rys-staging.name}.herokuapp.com"
 }
-/*
+*/
+
+/*  Mario David version
 
 resource "heroku_pipeline" "eraskin-rys-pipeline" {
   name = "eraskin-rys-pipeline"
