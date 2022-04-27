@@ -90,9 +90,8 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
     steps:
-
       - name: Checkout App
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
