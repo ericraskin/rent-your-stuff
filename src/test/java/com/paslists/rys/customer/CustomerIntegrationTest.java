@@ -8,11 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
-import javax.validation.groups.Default;
-
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,9 +21,6 @@ class CustomerIntegrationTest {
     @Autowired
     SystemAuthenticator systemAuthenticator;
 
-    @Autowired
-    Validator validator;
-
     private Customer customer;
 
     @BeforeEach
@@ -39,6 +32,7 @@ class CustomerIntegrationTest {
     void given_validCustomer_when_saveCustomer_then_customerIsSaved() {
 
         // given
+
 
         customer.setFirstName("Foo");
         customer.setLastName("Bar");
@@ -60,31 +54,5 @@ class CustomerIntegrationTest {
         assertThat(savedCustomer.getId())
                 .isNotNull();
 
-    }
-
-    @Test
-    void given_customerWithInvalidEmail_when_validateCustomer_then_customerIsInvalid() {
-
-        // given
-
-        customer.setLastName("Bar");
-        customer.setEmail("invalidEmailAddress");
-
-        // when
-        Set<ConstraintViolation<Customer>> violations = validator.validate(customer, Default.class);
-
-        // then
-
-        assertThat(violations).hasSize(1);
-
-        // and
-
-        assertThat(firstViolation(violations).getPropertyPath().toString()).isEqualTo("email");
-        assertThat(firstViolation(violations).getMessageTemplate()).isEqualTo("{javax.validation.constraints.Email.message}");
-
-    }
-
-    private ConstraintViolation<Customer> firstViolation(Set<ConstraintViolation<Customer>> violations) {
-        return violations.stream().findFirst().orElseThrow();
     }
 }
