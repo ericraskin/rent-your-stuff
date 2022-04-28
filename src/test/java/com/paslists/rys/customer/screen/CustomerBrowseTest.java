@@ -1,6 +1,7 @@
 package com.paslists.rys.customer.screen;
 
 import com.paslists.rys.RentYourStuffApplication;
+import com.paslists.rys.app.test_support.DatabaseCleanup;
 import com.paslists.rys.customer.Customer;
 import com.paslists.rys.entity.Address;
 import io.jmix.core.DataManager;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,10 +35,15 @@ class CustomerBrowseTest {
     @Autowired
     DataManager dataManager;
 
+    @Autowired
+    DatabaseCleanup<Customer> databaseCleanup;
     private Customer customer;
+
 
     @BeforeEach
     void setUp() {
+        databaseCleanup.removeAllEntities(Customer.class);
+
         customer = dataManager.create(Customer.class);
         customer.setFirstName("Foo");
         customer.setLastName("Bar");
@@ -84,10 +91,10 @@ class CustomerBrowseTest {
         customersTable(customerBrowse).setSelected(customer);
     }
 
-    @NotNull
     private <T> T screenOfType(Screens screens, Class<T> tClass) {
-        Screen screen = screens.getOpenedScreens().getActiveScreens().stream().findFirst().orElseThrow();
+        Screen screen = screens.getOpenedScreens().getActiveScreens().stream().findFirst().orElse(null);
 
+        assertThat(screen).isNotNull();
         assertThat(screen).isInstanceOf(tClass);
 
         return (T) screen;
@@ -98,10 +105,9 @@ class CustomerBrowseTest {
         return (Button) customerBrowse.getWindow().getComponent(buttonId);
     }
 
-    @NotNull
     private Customer firstLoadedCustomer(CustomerBrowse customerBrowse) {
         Collection<Customer> customers = loadedCustomers(customerBrowse);
-        return customers.stream().findFirst().orElseThrow();
+        return customers.stream().findFirst().orElse(null);
     }
 
     @NotNull
