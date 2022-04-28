@@ -1,4 +1,4 @@
-package com.paslists.rys.customer;
+package com.paslists.rys.test_support;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,5 +1,6 @@
 package com.paslists.rys.customer;
 
+import com.paslists.rys.test_support.ValidationVerification;
 import io.jmix.core.DataManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

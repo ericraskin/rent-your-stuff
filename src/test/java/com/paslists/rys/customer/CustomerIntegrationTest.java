@@ -1,5 +1,6 @@
 package com.paslists.rys.customer;
 
+import com.paslists.rys.app.test_support.DatabaseCleanup;
 import com.paslists.rys.entity.Address;
 import io.jmix.core.DataManager;
 import io.jmix.core.security.SystemAuthenticator;
@@ -21,10 +22,14 @@ class CustomerIntegrationTest {
     @Autowired
     SystemAuthenticator systemAuthenticator;
 
+    @Autowired
+    DatabaseCleanup<Customer> databaseCleanup;
+
     private Customer customer;
 
     @BeforeEach
     void setUp() {
+        databaseCleanup.removeAllEntities(Customer.class);
         customer = dataManager.create(Customer.class);
     }
 
