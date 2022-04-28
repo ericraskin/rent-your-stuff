@@ -40,7 +40,12 @@ dependencies {
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
+
+    testImplementation 'io.jmix.ui:jmix-ui-test-assist'
+
     implementation("org.postgresql:postgresql")
+
+    testImplementation("org.hsqldb:hsqldb")
 }
 
 test {
