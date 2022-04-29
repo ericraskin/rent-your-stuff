@@ -15,12 +15,12 @@ public class FormInteractions {
     public static FormInteractions of(StandardEditor editor) {
         return new FormInteractions(editor);
     }
-    @Nullable public TextField<String> setFieldValue(String fieldName) {
+    @Nullable public TextField<String> setTextFieldValue(String fieldName) {
         return (TextField<String>) editor.getWindow().getComponent(fieldName);
     }
 
-    public void setFieldValue(String fieldname, String value) {
-        setFieldValue(fieldname).setValue(value);
+    public void setTextFieldValue(String fieldname, String value) {
+        setTextFieldValue(fieldname).setValue(value);
     }
     @Nullable public Button getButton(String buttonId) {
         return (Button) editor.getWindow().getComponent(buttonId);
