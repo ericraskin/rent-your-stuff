@@ -5,6 +5,7 @@ import io.jmix.ui.component.Table;
 import io.jmix.ui.screen.Screen;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class TableInteractions<E> {
 
@@ -25,7 +26,9 @@ public class TableInteractions<E> {
     }
 
     @Nullable
-    Button button(String buttonId) { return (Button) table.getButtonsPanel().getComponent(buttonId); }
+    Button button(String buttonId) {
+        return Optional.ofNullable((Button) table.getButtonsPanel().getComponent(buttonId)).orElseThrow();
+    }
 
     public E firstItem() { return table.getItems().getItems().stream().findFirst().orElseThrow(); }
 
