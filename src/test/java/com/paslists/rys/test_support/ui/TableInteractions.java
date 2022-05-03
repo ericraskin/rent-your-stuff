@@ -27,10 +27,10 @@ public class TableInteractions<E> {
 
     @Nullable
     Button button(String buttonId) {
-        return Optional.ofNullable((Button) table.getButtonsPanel().getComponent(buttonId)).orElseThrow();
+        return Optional.ofNullable((Button) table.getButtonsPanel().getComponent(buttonId)).orElse(null);
     }
 
-    public E firstItem() { return table.getItems().getItems().stream().findFirst().orElseThrow(); }
+    public E firstItem() { return table.getItems().getItems().stream().findFirst().orElse(null); }
 
     public void selectFirst() { table.setSelected(firstItem()); }
 

@@ -1,8 +1,9 @@
 package com.paslists.rys.product;
 
+import com.paslists.rys.entity.Currency;
+import com.paslists.rys.entity.Money;
 import com.paslists.rys.test_support.ValidationVerification;
 import io.jmix.core.DataManager;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ class ProductPriceValidationTest {
     @BeforeEach
     void setUp() {
         productPrice = dataManager.create(ProductPrice.class);
+        Money price = dataManager.create(Money.class);
+        price.setCurrency(Currency.USD);
+        productPrice.setPrice(price);
     }
 
     @Test
@@ -34,7 +38,8 @@ class ProductPriceValidationTest {
         // given
 
         productPrice.setUnit(PriceUnit.DAY);
-        productPrice.setAmount(BigDecimal.ONE);
+
+        productPrice.getPrice().setAmount(BigDecimal.ONE);
         productPrice.setProduct(dataManager.create(Product.class));
 
         // when
@@ -51,7 +56,7 @@ class ProductPriceValidationTest {
 
         // given
 
-        productPrice.setAmount(BigDecimal.ONE);
+        productPrice.getPrice().setAmount(BigDecimal.ONE);
         productPrice.setProduct(dataManager.create(Product.class));
 
         // and
@@ -76,17 +81,16 @@ class ProductPriceValidationTest {
     }
 
     @Test
-    void given_ProductPriceWithoutAmount_when_validate_then_oneViolationOccurs() {
+    void given_ProductwithoutPrice_when_validate_then_oneViolationOccurs() {
 
         // given
 
         productPrice.setUnit(PriceUnit.DAY);
-        productPrice.setAmount(BigDecimal.ONE);
         productPrice.setProduct(dataManager.create(Product.class));
 
         // and
 
-        productPrice.setAmount(null);
+        productPrice.setPrice(null);
 
         // when
         List<ValidationVerification.ValidationResult<ProductPrice>> violations = validationVerification.validate(productPrice);
@@ -98,7 +102,7 @@ class ProductPriceValidationTest {
         ValidationVerification.ValidationResult<ProductPrice> unitViolation = violations.get(0);
 
         assertThat(unitViolation.getAttribute()).
-                isEqualTo("amount");
+                isEqualTo("price");
 
         assertThat(unitViolation.getErrorType()).
                 isEqualTo(validationVerification.validationMessage("NotNull"));
@@ -106,7 +110,7 @@ class ProductPriceValidationTest {
     }
 
     @Test
-    void given_ProductPriceWithNegativeAmount_when_validate_then_oneViolationOccurs() {
+    void given_ProductPriceWithoutAmount_when_validate_then_oneViolationOccurs() {
 
         // given
 
@@ -115,7 +119,7 @@ class ProductPriceValidationTest {
 
         // and
 
-        productPrice.setAmount(negativeAmount());
+        productPrice.getPrice().setAmount(null);
 
         // when
         List<ValidationVerification.ValidationResult<ProductPrice>> violations = validationVerification.validate(productPrice);
@@ -127,10 +131,10 @@ class ProductPriceValidationTest {
         ValidationVerification.ValidationResult<ProductPrice> unitViolation = violations.get(0);
 
         assertThat(unitViolation.getAttribute()).
-                isEqualTo("amount");
+                isEqualTo("price.amount");
 
         assertThat(unitViolation.getErrorType()).
-                isEqualTo(validationVerification.validationMessage("PositiveOrZero"));
+                isEqualTo(validationVerification.validationMessage("NotNull"));
 
     }
 
@@ -140,7 +144,7 @@ class ProductPriceValidationTest {
         // given
 
         productPrice.setUnit(PriceUnit.DAY);
-        productPrice.setAmount(BigDecimal.ONE);
+        productPrice.getPrice().setAmount(BigDecimal.ONE);
 
         // and
 
@@ -161,11 +165,6 @@ class ProductPriceValidationTest {
         assertThat(unitViolation.getErrorType()).
                 isEqualTo(validationVerification.validationMessage("NotNull"));
 
-    }
-
-    @NotNull
-    private BigDecimal negativeAmount() {
-        return BigDecimal.valueOf(-10d);
     }
 
 }

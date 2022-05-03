@@ -1,6 +1,7 @@
 package com.paslists.rys.product.screen;
 
 import com.paslists.rys.app.test_support.DatabaseCleanup;
+import com.paslists.rys.entity.Currency;
 import com.paslists.rys.product.PriceUnit;
 import com.paslists.rys.product.Product;
 import com.paslists.rys.product.ProductPrice;
@@ -68,7 +69,7 @@ class ProductEditTest extends WebIntegrationTest {
     }
 
     @Test
-    void given_productWithoutStreet_when_saveProductThroughTheForm_then_productIsNotSaved(Screens screens) {
+    void given_productWithoutName_when_saveProductThroughTheForm_then_productIsNotSaved(Screens screens) {
 
         // given
         ScreenInteractions screenInteractions = ScreenInteractions.forEditor(screens, dataManager);
@@ -111,9 +112,12 @@ class ProductEditTest extends WebIntegrationTest {
         FormInteractions priceForm = FormInteractions.of(productPriceEdit);
 
         BigDecimal expectedAmount = BigDecimal.TEN;
+        Currency expectedCurrency = Currency.USD;
         PriceUnit expectedUnit = PriceUnit.DAY;
 
-        priceForm.setNumberFieldValue("amountField", expectedAmount);
+        //priceForm.setCurrencyFieldValue("priceAmountField", expectedAmount, expectedCurrency);
+        priceForm.setBigDecimalFieldValue("priceAmountField", expectedAmount);
+        priceForm.setEnumFieldValue("priceCurrencyField", expectedCurrency);
         priceForm.setEnumFieldValue("unitField", expectedUnit);
 
         //when
@@ -144,8 +148,11 @@ class ProductEditTest extends WebIntegrationTest {
 
         ProductPrice price = prices.get(0);
 
-        assertThat(price.getAmount())
+        assertThat(price.getPrice().getAmount())
                 .isEqualByComparingTo(expectedAmount);
+
+        assertThat(price.getPrice().getCurrency())
+                .isEqualTo(expectedCurrency);
 
         assertThat(price.getUnit())
                 .isEqualTo(expectedUnit);
