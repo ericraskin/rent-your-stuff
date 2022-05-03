@@ -4,6 +4,7 @@ import com.paslists.rys.app.test_support.DatabaseCleanup;
 import com.paslists.rys.entity.Currency;
 import com.paslists.rys.product.PriceUnit;
 import com.paslists.rys.product.Product;
+import com.paslists.rys.product.ProductCategory;
 import com.paslists.rys.product.ProductPrice;
 import com.paslists.rys.product.screen.productprice.ProductPriceEdit;
 import com.paslists.rys.test_support.ui.FormInteractions;
@@ -35,11 +36,13 @@ class ProductEditTest extends WebIntegrationTest {
     FormInteractions formInteractions;
 
     @Autowired
-    DatabaseCleanup<Product> databaseCleanup;
+    DatabaseCleanup databaseCleanup;
 
     @BeforeEach
     void setUp() {
         databaseCleanup.removeAllEntities(Product.class);
+        databaseCleanup.removeAllEntities(ProductPrice.class);
+        databaseCleanup.removeAllEntities(ProductCategory.class);
     }
 
     @Test
@@ -158,6 +161,63 @@ class ProductEditTest extends WebIntegrationTest {
                 .isEqualTo(expectedUnit);
     }
 
+    @Test
+    void given_twoProductCategoriesArePresent_when_openingTheProductEditor_then_categoriesAreDisplayedInTheComboBox(Screens screens) {
+
+        // given
+
+        ProductCategory productCategory1 = saveProductCategory("Product Category 1");
+        ProductCategory productCategory2 = saveProductCategory("Product Category 2");
+
+        // when
+
+        ScreenInteractions screenInteractions = ScreenInteractions.forEditor(screens, dataManager);
+        ProductEdit productEdit = screenInteractions.openEditorForCreation(ProductEdit.class, Product.class);
+
+        formInteractions = FormInteractions.of(productEdit);
+
+        // then
+
+        List<ProductCategory> availableProductCategories = formInteractions.getEntityComboBoxValues("categoryField", ProductCategory.class);
+
+        assertThat(availableProductCategories)
+                .contains(productCategory1, productCategory2);
+    }
+
+    @Test
+    void given_validProductWithCategory_when_saveProductThroughTheForm_then_productAndCategoryAssocationAreSaved(Screens screens) {
+
+        // given
+
+        ProductCategory productCategory1 = saveProductCategory("Product Category 1");
+
+        ScreenInteractions screenInteractions = ScreenInteractions.forEditor(screens, dataManager);
+        ProductEdit productEdit = screenInteractions.openEditorForCreation(ProductEdit.class, Product.class);
+
+        formInteractions = FormInteractions.of(productEdit);
+
+        // and
+        String name = "Foo Product" + UUID.randomUUID();
+        formInteractions.setTextFieldValue("nameField",name);
+
+        // and
+
+        formInteractions.setEntityComboBoxFieldValue("categoryField", productCategory1, ProductCategory.class);
+
+        // when
+        OperationResult productFormResult = formInteractions.saveForm();
+        assertThat(productFormResult).isEqualTo(OperationResult.success());
+
+        // then
+        Optional<Product> savedProduct = findProductByAttribute("name", name);
+
+        assertThat(savedProduct)
+                .isPresent()
+                .get()
+                .extracting("category")
+                .isEqualTo(productCategory1);
+    }
+
     @NotNull
     private Optional<Product> findProductByAttribute(String attribute, String firstName) {
         return dataManager.load(Product.class)
@@ -165,4 +225,11 @@ class ProductEditTest extends WebIntegrationTest {
                 .optional();
     }
 
+    @NotNull
+    private ProductCategory saveProductCategory(String name) {
+        ProductCategory productCategory = dataManager.create(ProductCategory.class);
+        productCategory.setName(name);
+        ProductCategory savedProductCategory = dataManager.save(productCategory);
+        return savedProductCategory;
+    }
 }
