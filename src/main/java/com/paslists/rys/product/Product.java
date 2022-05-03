@@ -12,7 +12,9 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @JmixEntity
-@Table(name = "RYS_PRODUCT")
+@Table(name = "RYS_PRODUCT", indexes = {
+        @Index(name = "IDX_PRODUCT_CATEGORY_ID", columnList = "CATEGORY_ID")
+})
 @Entity(name = "rys_Product")
 public class Product extends StandardEntity {
     @InstanceName
@@ -28,6 +30,18 @@ public class Product extends StandardEntity {
     @Composition
     @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST)
     private List<ProductPrice> prices;
+
+    @JoinColumn(name = "CATEGORY_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ProductCategory category;
+
+    public ProductCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ProductCategory category) {
+        this.category = category;
+    }
 
     public List<ProductPrice> getPrices() {
         return prices;
