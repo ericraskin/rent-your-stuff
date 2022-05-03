@@ -35,7 +35,7 @@ public class ScreenInteractions {
                 .getActiveScreens().stream()
                 .filter(it -> screenClass.isAssignableFrom(it.getClass()))
                 .findFirst()
-                .orElseThrow();
+                .orElse(null);
 
         assertThat(screen).isInstanceOf(screenClass);
 

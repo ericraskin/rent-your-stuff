@@ -1,6 +1,8 @@
 package com.paslists.rys.product;
 
 import com.paslists.rys.app.test_support.DatabaseCleanup;
+import com.paslists.rys.entity.Currency;
+import com.paslists.rys.entity.Money;
 import io.jmix.core.DataManager;
 import io.jmix.core.security.SystemAuthenticator;
 import org.jetbrains.annotations.NotNull;
@@ -83,7 +85,10 @@ class ProductStorageTest {
     private ProductPrice createProductPrice(Product product, BigDecimal amount, PriceUnit priceUnit) {
         ProductPrice productPrice = dataManager.create(ProductPrice.class);
         productPrice.setProduct(product);
-        productPrice.setAmount(amount);
+        Money money = dataManager.create(Money.class);
+        money.setAmount(amount);
+        money.setCurrency(Currency.USD);
+        productPrice.setPrice(money);
         productPrice.setUnit(priceUnit);
         return productPrice;
     }

@@ -1,21 +1,23 @@
 package com.paslists.rys.product;
 
+import com.paslists.rys.entity.Money;
 import com.paslists.rys.entity.StandardEntity;
+import io.jmix.core.entity.annotation.EmbeddedParameters;
 import io.jmix.core.metamodel.annotation.DependsOnProperties;
 import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
-import java.math.BigDecimal;
 
 @JmixEntity
 @Table(name = "RYS_PRODUCT_PRICE", indexes = {
         @Index(name = "IDX_PRODUCTPRICE_PRODUCT_ID", columnList = "PRODUCT_ID")
 })
 @Entity(name = "rys_ProductPrice")
-public class ProductPrice extends StandardEntity {
+public class
+ProductPrice extends StandardEntity {
 
 
     @JoinColumn(name = "PRODUCT_ID", nullable = false)
@@ -23,14 +25,27 @@ public class ProductPrice extends StandardEntity {
     @NotNull
     private Product product;
 
-    @PositiveOrZero
-    @Column(name = "AMOUNT", nullable = false, precision = 19, scale = 2)
+    @Valid
     @NotNull
-    private BigDecimal amount;
+    @EmbeddedParameters(nullAllowed = false)
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "amount", column = @Column(name = "PRICE_AMOUNT")),
+            @AttributeOverride(name = "currency", column = @Column(name = "PRICE_CURRENCY"))
+    })
+    private Money price;
 
     @Column(name = "UNIT", nullable = false)
     @NotNull
     private String unit;
+
+    public Money getPrice() {
+        return price;
+    }
+
+    public void setPrice(Money price) {
+        this.price = price;
+    }
 
     public Product getProduct() {
         return product;
@@ -48,17 +63,10 @@ public class ProductPrice extends StandardEntity {
         this.unit = unit == null ? null : unit.getId();
     }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
 
     @InstanceName
-    @DependsOnProperties({"amount", "unit"})
+    @DependsOnProperties({"price", "unit"})
     public String getInstanceName() {
-        return String.format("%s %s", amount, unit);
+        return String.format("%s %s", price, unit);
     }
 }

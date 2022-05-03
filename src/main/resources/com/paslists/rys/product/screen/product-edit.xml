@@ -42,7 +42,7 @@
                     <action id="remove" type="remove"/>
                 </actions>
                 <columns>
-                    <column id="amount"/>
+                    <column id="price" align="RIGHT"/>
                     <column id="unit"/>
                 </columns>
                 <buttonsPanel>

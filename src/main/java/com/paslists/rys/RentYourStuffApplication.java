@@ -25,6 +25,13 @@ public class RentYourStuffApplication {
         SpringApplication.run(RentYourStuffApplication.class, args);
     }
 
+   @Bean
+    @Primary
+    @ConfigurationProperties("rys")
+    RentYourStuffProperties rentYourStuffProperties() {
+        return new RentYourStuffProperties();
+    }
+
     @Bean
     @Primary
     @ConfigurationProperties("main.datasource")

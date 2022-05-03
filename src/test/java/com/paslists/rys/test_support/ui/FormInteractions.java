@@ -1,5 +1,6 @@
 package com.paslists.rys.test_support.ui;
 
+import com.paslists.rys.entity.Currency;
 import io.jmix.core.metamodel.datatype.impl.EnumClass;
 import io.jmix.ui.component.*;
 import io.jmix.ui.screen.StandardEditor;
@@ -37,6 +38,10 @@ public class FormInteractions {
     TextField<Number> numberField(String componentId) {
         return (TextField<Number>) getComponent(componentId);
     }
+
+    TextField<BigDecimal> bigDecimalField(String componentId) {
+        return (TextField<BigDecimal>) getComponent(componentId);
+    }
     @Nullable
     CurrencyField<Number> currencyField(String componentId) {
         return (CurrencyField<Number>) getComponent(componentId);
@@ -70,8 +75,12 @@ public class FormInteractions {
     public void setNumberFieldValue(String componentId, Number value) {
         numberField(componentId).setValue(value);
     }
-    public void setCurrencyFieldValue(String componentId, BigDecimal value) {
+    public void setBigDecimalFieldValue(String componentId, BigDecimal value) {
+        bigDecimalField(componentId).setValue(value);
+    }
+    public void setCurrencyFieldValue(String componentId, BigDecimal value, Currency currency) {
         currencyField(componentId).setValue(value);
+        currencyField(componentId).setCurrency(currency.getId());
     }
 
     public OperationResult saveForm() {
@@ -89,7 +98,7 @@ public class FormInteractions {
     public <T> void setEntityComboBoxFieldValue(String componentId, T entity, Class<T> entityClass) {
         ComboBox<T> comboBox = entityComboBoxField(componentId, entityClass);
 
-        T entityFromComboBox = comboBox.getOptions().getOptions().filter(t -> t.equals(entity)).findFirst().orElseThrow();
+        T entityFromComboBox = comboBox.getOptions().getOptions().filter(t -> t.equals(entity)).findFirst().orElse(null);
         comboBox.setValue(entityFromComboBox);
     }
     public <T> void setEntitySuggestionFieldValue(String componentId, T entity, Class<T> entityClass) {

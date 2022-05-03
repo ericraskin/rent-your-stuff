@@ -5,7 +5,9 @@
     <data>
         <instance id="productPriceDc"
                   class="com.paslists.rys.product.ProductPrice">
-            <fetchPlan extends="_base"/>
+            <fetchPlan extends="_base">
+                <property name="price" fetchPlan="_base"/>
+            </fetchPlan>
             <loader/>
         </instance>
     </data>
@@ -28,9 +30,17 @@
                 forceDialog="true"/>
     <layout spacing="true" expand="editActions">
         <form id="form" dataContainer="productPriceDc">
-            <column width="350px">
-                <textField id="amountField" property="amount"/>
+            <column width="500px">
                 <comboBox id="unitField" property="unit"/>
+                <hbox spacing="true" width="AUTO">
+                    <textField id="priceAmountField"
+                               dataContainer="productPriceDc"
+                               property="price.amount"/>
+                    <comboBox id="priceCurrencyField"
+                              dataContainer="productPriceDc"
+                              property="price.currency"
+                              width="80px" />
+                </hbox>
             </column>
         </form>
         <hbox id="editActions" spacing="true">
