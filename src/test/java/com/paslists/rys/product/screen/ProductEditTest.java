@@ -2,11 +2,9 @@ package com.paslists.rys.product.screen;
 
 import com.paslists.rys.app.test_support.DatabaseCleanup;
 import com.paslists.rys.entity.Currency;
-import com.paslists.rys.product.PriceUnit;
-import com.paslists.rys.product.Product;
-import com.paslists.rys.product.ProductCategory;
-import com.paslists.rys.product.ProductPrice;
+import com.paslists.rys.product.*;
 import com.paslists.rys.product.screen.productprice.ProductPriceEdit;
+import com.paslists.rys.product.screen.stockitem.StockItemEdit;
 import com.paslists.rys.test_support.ui.FormInteractions;
 import com.paslists.rys.test_support.ui.ScreenInteractions;
 import com.paslists.rys.test_support.ui.TableInteractions;
@@ -17,6 +15,7 @@ import io.jmix.ui.Screens;
 import io.jmix.ui.util.OperationResult;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -38,6 +37,9 @@ class ProductEditTest extends WebIntegrationTest {
     @Autowired
     DatabaseCleanup databaseCleanup;
 
+    private ScreenInteractions screenInteractions;
+
+    private ProductEdit productEdit;
     @BeforeEach
     void setUp() {
         databaseCleanup.removeAllEntities(Product.class);
@@ -45,177 +47,219 @@ class ProductEditTest extends WebIntegrationTest {
         databaseCleanup.removeAllEntities(ProductCategory.class);
     }
 
-    @Test
-    void given_validProduct_when_saveProductThroughTheForm_then_productIsSaved(Screens screens) {
+    @Nested
+    class withOpenedProductEditForm extends WebIntegrationTest {
+        @BeforeEach
+        void setUp(Screens screens) {
+            initProductEditForm(screens);
+        }
 
-        // given
-        ScreenInteractions screenInteractions = ScreenInteractions.forEditor(screens, dataManager);
-        ProductEdit productEdit = screenInteractions.openEditorForCreation(ProductEdit.class, Product.class);
+        @Test
+        void given_validProduct_when_saveProductThroughTheForm_then_productIsSaved() {
 
-        formInteractions = FormInteractions.of(productEdit);
+            // given
 
-        // and
-        String name = "Foo Product" + UUID.randomUUID();
+            String name = "Foo Product" + UUID.randomUUID();
 
-        formInteractions.setTextFieldValue("nameField",name);
+            formInteractions.setTextFieldValue("nameField",name);
 
-        // when
-        OperationResult operationResult = formInteractions.saveForm();
+            // when
+            OperationResult operationResult = formInteractions.saveForm();
 
-        assertThat(operationResult).isEqualTo(OperationResult.success());
+            assertThat(operationResult).isEqualTo(OperationResult.success());
 
-        // then
-        Optional<Product> savedProduct = findProductByAttribute("name", name);
+            // then
+            Optional<Product> savedProduct = findProductByAttribute("name", name);
 
-        assertThat(savedProduct)
-                .isPresent();
+            assertThat(savedProduct)
+                    .isPresent();
+        }
+
+        @Test
+        void given_validProductWithPrice_when_saveProductThroughTheForm_then_productAndPriceAreSaved() {
+
+            // given
+            String name = "Foo Product" + UUID.randomUUID();
+            formInteractions.setTextFieldValue("nameField",name);
+
+            // and
+            TableInteractions<ProductPrice> pricesTable = TableInteractions.of(productEdit, ProductPrice.class, "pricesTable");
+            pricesTable.create();
+
+            ProductPriceEdit productPriceEdit = screenInteractions.findOpenScreen(ProductPriceEdit.class);
+            FormInteractions priceForm = FormInteractions.of(productPriceEdit);
+
+            BigDecimal expectedAmount = BigDecimal.TEN;
+            Currency expectedCurrency = Currency.USD;
+            PriceUnit expectedUnit = PriceUnit.DAY;
+
+            //priceForm.setCurrencyFieldValue("priceAmountField", expectedAmount, expectedCurrency);
+            priceForm.setBigDecimalFieldValue("priceAmountField", expectedAmount);
+            priceForm.setEnumFieldValue("priceCurrencyField", expectedCurrency);
+            priceForm.setEnumFieldValue("unitField", expectedUnit);
+
+            //when
+
+            OperationResult priceFormResult = priceForm.saveForm();
+
+            // then
+            assertThat(priceFormResult).isEqualTo(OperationResult.success());
+
+            // when
+            OperationResult productFormResult = formInteractions.saveForm();
+            assertThat(productFormResult).isEqualTo(OperationResult.success());
+
+            // then
+            Optional<Product> savedProduct = findProductByAttribute("name", name);
+
+            assertThat(savedProduct)
+                    .isPresent();
+
+            // and
+
+            List<ProductPrice> prices = savedProduct.get().getPrices();
+
+            assertThat(prices)
+                    .hasSize(1);
+
+            // and
+
+            ProductPrice price = prices.get(0);
+
+            assertThat(price.getPrice().getAmount())
+                    .isEqualByComparingTo(expectedAmount);
+
+            assertThat(price.getPrice().getCurrency())
+                    .isEqualTo(expectedCurrency);
+
+            assertThat(price.getUnit())
+                    .isEqualTo(expectedUnit);
+        }
+        @Test
+        void given_productWithoutName_when_saveProductThroughTheForm_then_productIsNotSaved() {
+
+            // given
+
+            formInteractions.setTextFieldValue("nameField", null);
+
+            // when
+            OperationResult operationResult = formInteractions.saveForm();
+
+            // then
+            assertThat(operationResult).isEqualTo(OperationResult.fail());
+
+            // and
+
+            assertThat(dataManager.load(Product.class).all().list()).isEmpty();
+        }
+
+        @Test
+        void given_validProductWithStockItem_when_saveProductThroughTheForm_then_productAndStockItemAreSaved() {
+
+            // given
+            String name = "Foo Product" + UUID.randomUUID();
+            formInteractions.setTextFieldValue("nameField",name);
+
+            // and
+            TableInteractions<StockItem> stockItemsTable = TableInteractions.of(productEdit, StockItem.class, "stockItemsTable");
+            stockItemsTable.create();
+
+            StockItemEdit stockItemEdit = screenInteractions.findOpenScreen(StockItemEdit.class);
+            FormInteractions stockItemForm = FormInteractions.of(stockItemEdit);
+
+            String expectedIdentifier = "Foo ID" + UUID.randomUUID();
+
+            //priceForm.setCurrencyFieldValue("priceAmountField", expectedAmount, expectedCurrency);
+            stockItemForm.setTextFieldValue("identifierField", expectedIdentifier);
+
+            //when
+
+            OperationResult stockItemFormResult = stockItemForm.saveForm();
+
+            // then
+            assertThat(stockItemFormResult).isEqualTo(OperationResult.success());
+
+            // when
+            OperationResult productFormResult = formInteractions.saveForm();
+            assertThat(productFormResult).isEqualTo(OperationResult.success());
+
+            // then
+            Optional<Product> savedProduct = findProductByAttribute("name", name);
+
+            assertThat(savedProduct)
+                    .isPresent();
+
+            // and
+
+            List<StockItem> stockItems = savedProduct.get().getStockItems();
+
+            assertThat(stockItems)
+                    .hasSize(1);
+
+            // and
+
+            StockItem stockItem = stockItems.get(0);
+
+            assertThat(stockItem.getIdentifier())
+                    .isEqualTo(expectedIdentifier);
+
+        }
     }
 
-    @Test
-    void given_productWithoutName_when_saveProductThroughTheForm_then_productIsNotSaved(Screens screens) {
+    @Nested
+    class ProductCategoryTests extends WebIntegrationTest {
 
-        // given
-        ScreenInteractions screenInteractions = ScreenInteractions.forEditor(screens, dataManager);
-        ProductEdit productEdit = screenInteractions.openEditorForCreation(ProductEdit.class, Product.class);
-        formInteractions = FormInteractions.of(productEdit);
+        private ProductCategory productCategory1;
+        private ProductCategory productCategory2;
 
-        // and
+        @BeforeEach
+        void setUp(Screens screens) {
+            productCategory1 = saveProductCategory("Product Category 1");
+            productCategory2 = saveProductCategory("Product Category 2");
+            initProductEditForm(screens);
+        }
+        @Test
+        void given_twoProductCategoriesArePresent_when_openingTheProductEditor_then_categoriesAreDisplayedInTheComboBox() {
 
-        formInteractions.setTextFieldValue("nameField", null);
+            // expect
 
-        // when
-        OperationResult operationResult = formInteractions.saveForm();
+            List<ProductCategory> availableProductCategories = formInteractions.getEntityComboBoxValues("categoryField", ProductCategory.class);
 
-        // then
-        assertThat(operationResult).isEqualTo(OperationResult.fail());
+            assertThat(availableProductCategories)
+                    .contains(productCategory1, productCategory2);
+        }
 
-        // and
+        @Test
+        void given_validProductWithCategory_when_saveProductThroughTheForm_then_productAndCategoryAssociationAreSaved() {
 
-        assertThat(dataManager.load(Product.class).all().list()).isEmpty();
+            // given
+
+            String name = "Foo Product" + UUID.randomUUID();
+            formInteractions.setTextFieldValue("nameField",name);
+
+            // and
+
+            formInteractions.setEntityComboBoxFieldValue("categoryField", productCategory1, ProductCategory.class);
+
+            // when
+            OperationResult productFormResult = formInteractions.saveForm();
+            assertThat(productFormResult).isEqualTo(OperationResult.success());
+
+            // then
+            Optional<Product> savedProduct = findProductByAttribute("name", name);
+
+            assertThat(savedProduct)
+                    .isPresent()
+                    .get()
+                    .extracting("category")
+                    .isEqualTo(productCategory1);
+        }
     }
 
-    @Test
-    void given_validProductWithPrice_when_saveProductThroughTheForm_then_productAndPriceAreSaved(Screens screens) {
-
-        // given
-        ScreenInteractions screenInteractions = ScreenInteractions.forEditor(screens, dataManager);
-        ProductEdit productEdit = screenInteractions.openEditorForCreation(ProductEdit.class, Product.class);
-
+    private void initProductEditForm(Screens screens) {
+        screenInteractions = ScreenInteractions.forEditor(screens, dataManager);
+        productEdit = screenInteractions.openEditorForCreation(ProductEdit.class, Product.class);
         formInteractions = FormInteractions.of(productEdit);
-
-        // and
-        String name = "Foo Product" + UUID.randomUUID();
-        formInteractions.setTextFieldValue("nameField",name);
-
-        // and
-        TableInteractions<ProductPrice> pricesTable = TableInteractions.of(productEdit, ProductPrice.class, "pricesTable");
-        pricesTable.create();
-
-        ProductPriceEdit productPriceEdit = screenInteractions.findOpenScreen(ProductPriceEdit.class);
-        FormInteractions priceForm = FormInteractions.of(productPriceEdit);
-
-        BigDecimal expectedAmount = BigDecimal.TEN;
-        Currency expectedCurrency = Currency.USD;
-        PriceUnit expectedUnit = PriceUnit.DAY;
-
-        //priceForm.setCurrencyFieldValue("priceAmountField", expectedAmount, expectedCurrency);
-        priceForm.setBigDecimalFieldValue("priceAmountField", expectedAmount);
-        priceForm.setEnumFieldValue("priceCurrencyField", expectedCurrency);
-        priceForm.setEnumFieldValue("unitField", expectedUnit);
-
-        //when
-
-        OperationResult priceFormResult = priceForm.saveForm();
-
-        // then
-        assertThat(priceFormResult).isEqualTo(OperationResult.success());
-
-        // when
-        OperationResult productFormResult = formInteractions.saveForm();
-        assertThat(productFormResult).isEqualTo(OperationResult.success());
-
-        // then
-        Optional<Product> savedProduct = findProductByAttribute("name", name);
-
-        assertThat(savedProduct)
-                .isPresent();
-
-        // and
-
-        List<ProductPrice> prices = savedProduct.get().getPrices();
-
-        assertThat(prices)
-                .hasSize(1);
-
-        // and
-
-        ProductPrice price = prices.get(0);
-
-        assertThat(price.getPrice().getAmount())
-                .isEqualByComparingTo(expectedAmount);
-
-        assertThat(price.getPrice().getCurrency())
-                .isEqualTo(expectedCurrency);
-
-        assertThat(price.getUnit())
-                .isEqualTo(expectedUnit);
-    }
-
-    @Test
-    void given_twoProductCategoriesArePresent_when_openingTheProductEditor_then_categoriesAreDisplayedInTheComboBox(Screens screens) {
-
-        // given
-
-        ProductCategory productCategory1 = saveProductCategory("Product Category 1");
-        ProductCategory productCategory2 = saveProductCategory("Product Category 2");
-
-        // when
-
-        ScreenInteractions screenInteractions = ScreenInteractions.forEditor(screens, dataManager);
-        ProductEdit productEdit = screenInteractions.openEditorForCreation(ProductEdit.class, Product.class);
-
-        formInteractions = FormInteractions.of(productEdit);
-
-        // then
-
-        List<ProductCategory> availableProductCategories = formInteractions.getEntityComboBoxValues("categoryField", ProductCategory.class);
-
-        assertThat(availableProductCategories)
-                .contains(productCategory1, productCategory2);
-    }
-
-    @Test
-    void given_validProductWithCategory_when_saveProductThroughTheForm_then_productAndCategoryAssocationAreSaved(Screens screens) {
-
-        // given
-
-        ProductCategory productCategory1 = saveProductCategory("Product Category 1");
-
-        ScreenInteractions screenInteractions = ScreenInteractions.forEditor(screens, dataManager);
-        ProductEdit productEdit = screenInteractions.openEditorForCreation(ProductEdit.class, Product.class);
-
-        formInteractions = FormInteractions.of(productEdit);
-
-        // and
-        String name = "Foo Product" + UUID.randomUUID();
-        formInteractions.setTextFieldValue("nameField",name);
-
-        // and
-
-        formInteractions.setEntityComboBoxFieldValue("categoryField", productCategory1, ProductCategory.class);
-
-        // when
-        OperationResult productFormResult = formInteractions.saveForm();
-        assertThat(productFormResult).isEqualTo(OperationResult.success());
-
-        // then
-        Optional<Product> savedProduct = findProductByAttribute("name", name);
-
-        assertThat(savedProduct)
-                .isPresent()
-                .get()
-                .extracting("category")
-                .isEqualTo(productCategory1);
     }
 
     @NotNull
@@ -229,7 +273,6 @@ class ProductEditTest extends WebIntegrationTest {
     private ProductCategory saveProductCategory(String name) {
         ProductCategory productCategory = dataManager.create(ProductCategory.class);
         productCategory.setName(name);
-        ProductCategory savedProductCategory = dataManager.save(productCategory);
-        return savedProductCategory;
+        return dataManager.save(productCategory);
     }
 }

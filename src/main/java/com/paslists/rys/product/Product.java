@@ -35,6 +35,19 @@ public class Product extends StandardEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private ProductCategory category;
 
+    @OnDelete(DeletePolicy.CASCADE)
+    @Composition
+    @OneToMany(mappedBy = "product")
+    private List<StockItem> stockItems;
+
+    public List<StockItem> getStockItems() {
+        return stockItems;
+    }
+
+    public void setStockItems(List<StockItem> stockItems) {
+        this.stockItems = stockItems;
+    }
+
     public ProductCategory getCategory() {
         return category;
     }

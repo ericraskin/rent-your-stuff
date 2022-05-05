@@ -36,8 +36,11 @@ public class TableInteractions<E> {
 
     public void edit(E entity) {
         table.setSelected(entity);
+//        table.getActionNN("edit").actionPerform(null);
         button("editBtn").click();
     }
 
-    public void create() { button("createBtn").click(); }
+    public void create() {
+        table.getActionNN("create").actionPerform(null);
+    }
 }
