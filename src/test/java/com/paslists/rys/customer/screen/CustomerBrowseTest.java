@@ -38,7 +38,7 @@ class CustomerBrowseTest extends WebIntegrationTest {
         address.setStreet("Foo Street 1");
         customer.setAddress(address);
 
-        dataManager.save(customer);
+        customer = dataManager.save(customer);
     }
 
     @Test
