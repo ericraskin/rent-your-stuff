@@ -1,6 +1,5 @@
 package com.paslists.rys.product.screen;
 
-import com.paslists.rys.app.test_support.DatabaseCleanup;
 import com.paslists.rys.entity.Currency;
 import com.paslists.rys.product.*;
 import com.paslists.rys.product.screen.productprice.ProductPriceEdit;
@@ -34,21 +33,13 @@ class ProductEditTest extends WebIntegrationTest {
 
     FormInteractions formInteractions;
 
-    @Autowired
-    DatabaseCleanup databaseCleanup;
-
     private ScreenInteractions screenInteractions;
 
     private ProductEdit productEdit;
-    @BeforeEach
-    void setUp() {
-        databaseCleanup.removeAllEntities(Product.class);
-        databaseCleanup.removeAllEntities(ProductPrice.class);
-        databaseCleanup.removeAllEntities(ProductCategory.class);
-    }
 
     @Nested
-    class withOpenedProductEditForm extends WebIntegrationTest {
+    class withOpenedProductEditForm extends WebIntegrationTest
+    {
         @BeforeEach
         void setUp(Screens screens) {
             initProductEditForm(screens);

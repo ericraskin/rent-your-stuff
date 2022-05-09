@@ -3,7 +3,6 @@ package com.paslists.rys.entity;
 
 import io.jmix.core.annotation.DeletedBy;
 import io.jmix.core.annotation.DeletedDate;
-import io.jmix.core.annotation.TenantId;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 import org.springframework.data.annotation.CreatedBy;
@@ -17,7 +16,7 @@ import java.util.UUID;
 
 @JmixEntity
 @MappedSuperclass
-public class StandardEntity {
+public class GlobalEntity {
 
     @JmixGeneratedValue
     @Column(name = "ID", nullable = false)
@@ -54,10 +53,6 @@ public class StandardEntity {
     @Column(name = "DELETED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date deletedDate;
-
-    @Column
-    @TenantId
-    private String tenantId;
 
     public Date getDeletedDate() {
         return deletedDate;
@@ -113,14 +108,6 @@ public class StandardEntity {
 
     public void setVersion(Integer version) {
         this.version = version;
-    }
-
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(String tenantId) {
-        this.tenantId = tenantId;
     }
 
     public UUID getId() {

@@ -23,6 +23,7 @@ public class ProductPriceEdit extends StandardEditor<ProductPrice> {
 
     @Autowired
     private RentYourStuffProperties rentYourStuffProperties;
+
     @Autowired
     private Messages messages;
 
