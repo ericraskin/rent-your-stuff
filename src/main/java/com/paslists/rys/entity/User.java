@@ -2,11 +2,13 @@ package com.paslists.rys.entity;
 
 import io.jmix.core.HasTimeZone;
 import io.jmix.core.annotation.Secret;
+import io.jmix.core.annotation.TenantId;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.entity.annotation.SystemLevel;
 import io.jmix.core.metamodel.annotation.DependsOnProperties;
 import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
+import io.jmix.multitenancy.core.AcceptsTenant;
 import io.jmix.security.authentication.JmixUserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import javax.persistence.*;
@@ -20,7 +22,11 @@ import java.util.UUID;
 @Table(name = "RYS_USER", indexes = {
         @Index(name = "IDX_RYS_USER_ON_USERNAME", columnList = "USERNAME", unique = true)
 })
-public class User implements JmixUserDetails, HasTimeZone {
+public class User implements JmixUserDetails, HasTimeZone, AcceptsTenant {
+
+    @TenantId
+    @Column(name="TENANT")
+    private String tenantId;
 
     @Id
     @Column(name = "ID")
@@ -121,6 +127,14 @@ public class User implements JmixUserDetails, HasTimeZone {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     @Override

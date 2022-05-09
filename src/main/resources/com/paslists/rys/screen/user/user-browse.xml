@@ -49,6 +49,9 @@
                 <action id="resetRememberMeToken" type="resetRememberMeToken"/>
             </actions>
             <columns>
+                <group>
+                    <column id="tenantId"></column>
+                </group>
                 <column id="username"/>
                 <column id="firstName"/>
                 <column id="lastName"/>
