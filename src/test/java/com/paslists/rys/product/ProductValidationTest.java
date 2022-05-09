@@ -1,6 +1,5 @@
 package com.paslists.rys.product;
 
-import com.paslists.rys.customer.Customer;
 import com.paslists.rys.test_support.ValidationVerification;
 import io.jmix.core.DataManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,6 +55,14 @@ class ProductValidationTest {
         // then
 
         assertThat(violations).hasSize(1);
+
+        ValidationVerification.ValidationResult<Product> unitViolation = violations.get(0);
+
+        assertThat(unitViolation.getAttribute()).
+                isEqualTo("name");
+
+        assertThat(unitViolation.getErrorType()).
+                isEqualTo(validationVerification.validationMessage("NotNull"));
 
     }
 
