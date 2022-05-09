@@ -1,4 +1,4 @@
-package com.paslists.rys.app.test_support;
+package com.paslists.rys.test_support;
 
 import io.jmix.core.DataManager;
 import io.jmix.core.SaveContext;

@@ -1,9 +1,8 @@
 package com.paslists.rys.customer;
 
-import com.paslists.rys.app.test_support.DatabaseCleanup;
 import com.paslists.rys.entity.Address;
+import com.paslists.rys.test_support.ui.WebIntegrationTest;
 import io.jmix.core.DataManager;
-import io.jmix.core.security.SystemAuthenticator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,22 +11,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class CustomerIntegrationTest {
+class CustomerIntegrationTest extends WebIntegrationTest {
 
     @Autowired
     DataManager dataManager;
-
-    @Autowired
-    SystemAuthenticator systemAuthenticator;
-
-    @Autowired
-    DatabaseCleanup<Customer> databaseCleanup;
 
     private Customer customer;
 
     @BeforeEach
     void setUp() {
-        databaseCleanup.removeAllEntities(Customer.class);
         customer = dataManager.create(Customer.class);
     }
 
@@ -35,7 +27,6 @@ class CustomerIntegrationTest {
     void given_validCustomer_when_saveCustomer_then_customerIsSaved() {
 
         // given
-
 
         customer.setFirstName("Foo");
         customer.setLastName("Bar");
@@ -50,7 +41,7 @@ class CustomerIntegrationTest {
 
         // when
 
-        Customer savedCustomer = systemAuthenticator.withSystem( () -> dataManager.save(customer));
+        Customer savedCustomer = dataManager.save(customer);
 
         // then
 

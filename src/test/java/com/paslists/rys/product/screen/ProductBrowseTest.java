@@ -1,6 +1,5 @@
 package com.paslists.rys.product.screen;
 
-import com.paslists.rys.app.test_support.DatabaseCleanup;
 import com.paslists.rys.product.Product;
 import com.paslists.rys.test_support.ui.ScreenInteractions;
 import com.paslists.rys.test_support.ui.TableInteractions;
@@ -20,15 +19,10 @@ class ProductBrowseTest extends WebIntegrationTest {
     @Autowired
     DataManager dataManager;
 
-    @Autowired
-    DatabaseCleanup<Product> databaseCleanup;
     private Product product;
-
 
     @BeforeEach
     void setUp() {
-        databaseCleanup.removeAllEntities(Product.class);
-
         product = dataManager.create(Product.class);
         product.setName("Foo Product");
 

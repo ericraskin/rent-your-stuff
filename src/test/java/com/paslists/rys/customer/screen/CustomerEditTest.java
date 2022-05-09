@@ -1,6 +1,5 @@
 package com.paslists.rys.customer.screen;
 
-import com.paslists.rys.app.test_support.DatabaseCleanup;
 import com.paslists.rys.customer.Customer;
 import com.paslists.rys.test_support.ui.FormInteractions;
 import com.paslists.rys.test_support.ui.ScreenInteractions;
@@ -10,7 +9,6 @@ import io.jmix.core.querycondition.PropertyCondition;
 import io.jmix.ui.Screens;
 import io.jmix.ui.util.OperationResult;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,13 +25,6 @@ class CustomerEditTest extends WebIntegrationTest {
 
     FormInteractions formInteractions;
 
-    @Autowired
-    DatabaseCleanup<Customer> databaseCleanup;
-
-    @BeforeEach
-    void setUp() {
-        databaseCleanup.removeAllEntities(Customer.class);
-    }
 
     @Test
     void given_validCustomer_when_saveCustomerThroughTheForm_then_customerIsSaved(Screens screens) {

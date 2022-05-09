@@ -1,6 +1,5 @@
 package com.paslists.rys.customer.screen;
 
-import com.paslists.rys.app.test_support.DatabaseCleanup;
 import com.paslists.rys.customer.Customer;
 import com.paslists.rys.entity.Address;
 import com.paslists.rys.test_support.ui.ScreenInteractions;
@@ -21,14 +20,11 @@ class CustomerBrowseTest extends WebIntegrationTest {
     @Autowired
     DataManager dataManager;
 
-    @Autowired
-    DatabaseCleanup<Customer> databaseCleanup;
     private Customer customer;
 
 
     @BeforeEach
     void setUp() {
-        databaseCleanup.removeAllEntities(Customer.class);
 
         customer = dataManager.create(Customer.class);
         customer.setFirstName("Foo");

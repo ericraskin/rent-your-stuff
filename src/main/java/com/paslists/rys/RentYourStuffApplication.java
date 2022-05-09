@@ -25,7 +25,7 @@ public class RentYourStuffApplication {
         SpringApplication.run(RentYourStuffApplication.class, args);
     }
 
-   @Bean
+    @Bean
     @Primary
     @ConfigurationProperties("rys")
     RentYourStuffProperties rentYourStuffProperties() {
