@@ -1,26 +1,30 @@
 package com.paslists.rys.order;
 
 import com.paslists.rys.customer.Customer;
-import com.paslists.rys.test_support.ValidationVerification;
+import com.paslists.rys.test_support.Validations;
+import com.paslists.rys.test_support.ui.WebIntegrationTest;
 import io.jmix.core.DataManager;
+import io.jmix.core.MetadataTools;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class OrderValidationTest {
+class OrderValidationTest extends WebIntegrationTest {
 
     @Autowired
     DataManager dataManager;
 
     @Autowired
-    ValidationVerification<Order> validationVerification;
+    MetadataTools metadataTools;
+
+    @Autowired
+    Validations<Order> validations;
     private Order order;
     private final LocalDate TODAY = LocalDate.now();
     private final LocalDate YESTERDAY = TODAY.minusDays(1);
@@ -38,12 +42,9 @@ class OrderValidationTest {
         order.setOrderDate(TODAY);
         order.setCustomer(dataManager.create(Customer.class));
 
-        // when
-        List<ValidationVerification.ValidationResult<Order>> violations = validationVerification.validate(order);
-
         // then
 
-        assertThat(violations).isEmpty();
+        validations.assertNoViolations(order);
 
     }
 
@@ -55,20 +56,9 @@ class OrderValidationTest {
         order.setOrderDate(null);
         order.setCustomer(dataManager.create(Customer.class));
 
-        // when
-        List<ValidationVerification.ValidationResult<Order>> violations = validationVerification.validate(order);
-
         // then
 
-        assertThat(violations).hasSize(1);
-
-        ValidationVerification.ValidationResult<Order> unitViolation = violations.get(0);
-
-        assertThat(unitViolation.getAttribute()).
-                isEqualTo("orderDate");
-
-        assertThat(unitViolation.getErrorType()).
-                isEqualTo(validationVerification.validationMessage("NotNull"));
+        validations.assertOneViolationWith(order, "orderDate", "NotNull");
     }
 
     @Test
@@ -79,20 +69,9 @@ class OrderValidationTest {
         order.setOrderDate(YESTERDAY);
         order.setCustomer(dataManager.create(Customer.class));
 
-        // when
-        List<ValidationVerification.ValidationResult<Order>> violations = validationVerification.validate(order);
-
         // then
 
-        assertThat(violations).hasSize(1);
-
-        ValidationVerification.ValidationResult<Order> unitViolation = violations.get(0);
-
-        assertThat(unitViolation.getAttribute()).
-                isEqualTo("orderDate");
-
-        assertThat(unitViolation.getErrorType()).
-                isEqualTo(validationVerification.validationMessage("FutureOrPresent"));
+        validations.assertOneViolationWith(order, "orderDate", "FutureOrPresent");
     }
 
     @Test
@@ -103,19 +82,28 @@ class OrderValidationTest {
         order.setOrderDate(TODAY);
         order.setCustomer(null);
 
-        // when
-        List<ValidationVerification.ValidationResult<Order>> violations = validationVerification.validate(order);
+        // then
+
+        validations.assertOneViolationWith(order, "customer", "NotNull");
+    }
+
+    @Test
+    void given_orderContainsCustomerAndOrderDate_expect_instanceNameContainsFormattedValues() {
+
+        // given
+
+        Customer customer = dataManager.create(Customer.class);
+        customer.setFirstName("Foo");
+        customer.setLastName("Bar");
+        order.setCustomer(customer);
+
+        // and
+
+        order.setOrderDate(LocalDate.parse("2022-05-10"));
 
         // then
 
-        assertThat(violations).hasSize(1);
-
-        ValidationVerification.ValidationResult<Order> unitViolation = violations.get(0);
-
-        assertThat(unitViolation.getAttribute()).
-                isEqualTo("customer");
-
-        assertThat(unitViolation.getErrorType()).
-                isEqualTo(validationVerification.validationMessage("NotNull"));
+        assertThat(metadataTools.getInstanceName(order))
+                .isEqualTo("Foo Bar - 10/05/2022");
     }
 }

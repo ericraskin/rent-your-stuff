@@ -1,6 +1,6 @@
 package com.paslists.rys.product;
 
-import com.paslists.rys.test_support.ValidationVerification;
+import com.paslists.rys.test_support.Validations;
 import io.jmix.core.DataManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,10 +10,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @SpringBootTest
 class ProductCategoryValidationTest {
 
@@ -21,12 +17,12 @@ class ProductCategoryValidationTest {
     DataManager dataManager;
 
     @Autowired
-    ValidationVerification<ProductCategory> validationVerification;
-    private ProductCategory ProductCategory;
+    Validations<ProductCategory> validations;
+    private ProductCategory productCategory;
 
     @BeforeEach
     void setUp() {
-        ProductCategory = dataManager.create(ProductCategory.class);
+        productCategory = dataManager.create(ProductCategory.class);
     }
 
     @Test
@@ -34,14 +30,11 @@ class ProductCategoryValidationTest {
 
         // given
 
-        ProductCategory.setName("Foo Category");
-
-        // when
-        List<ValidationVerification.ValidationResult<ProductCategory>> violations = validationVerification.validate(ProductCategory);
+        productCategory.setName("Foo Category");
 
         // then
 
-        assertThat(violations).isEmpty();
+        validations.assertNoViolations(productCategory);
 
     }
 
@@ -52,22 +45,10 @@ class ProductCategoryValidationTest {
 
         // given
 
-        ProductCategory.setName(name);
-
-        // when
-        List<ValidationVerification.ValidationResult<ProductCategory>> violations = validationVerification.validate(ProductCategory);
+        productCategory.setName(name);
 
         // then
 
-        assertThat(violations).hasSize(1);
-
-        ValidationVerification.ValidationResult<ProductCategory> unitViolation = violations.get(0);
-
-        assertThat(unitViolation.getAttribute()).
-                isEqualTo("name");
-
-        assertThat(unitViolation.getErrorType()).
-                isEqualTo(validationVerification.validationMessage("NotBlank"));
-
+        validations.assertOneViolationWith(productCategory, "name", "NotBlank");
     }
 }
