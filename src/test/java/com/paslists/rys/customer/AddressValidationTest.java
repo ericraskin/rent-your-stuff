@@ -1,16 +1,12 @@
 package com.paslists.rys.customer;
 
 import com.paslists.rys.entity.Address;
-import com.paslists.rys.test_support.ValidationVerification;
+import com.paslists.rys.test_support.Validations;
 import io.jmix.core.DataManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class AddressValidationTest {
@@ -19,7 +15,7 @@ class AddressValidationTest {
     DataManager dataManager;
 
     @Autowired
-    ValidationVerification<Address> validationVerification;
+    Validations<Address> validations;
     private Address address;
 
     @BeforeEach
@@ -34,13 +30,9 @@ class AddressValidationTest {
 
         address.setStreet(null);
 
-        // when
-        List<ValidationVerification.ValidationResult<Address>> violations = validationVerification.validate(address);
-
         // then
 
-        assertThat(violations).hasSize(1);
-
+        validations.assertOneViolationWith(address, "street", "NotBlank");
     }
 
     @Test
@@ -50,16 +42,9 @@ class AddressValidationTest {
 
         address.setStreet(null);
 
-        // when
-        ValidationVerification.ValidationResult<Address> streetViolation = validationVerification.validateFirst(address);
-
         // then
 
-        assertThat(streetViolation.getAttribute()).
-                isEqualTo("street");
-
-        assertThat(streetViolation.getErrorType()).
-                isEqualTo(validationVerification.validationMessage("NotBlank"));
+        validations.assertOneViolationWith(address, "street", "NotBlank");
     }
 
 }

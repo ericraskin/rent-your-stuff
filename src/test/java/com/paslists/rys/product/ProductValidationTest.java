@@ -1,16 +1,11 @@
 package com.paslists.rys.product;
 
-import com.paslists.rys.customer.Customer;
-import com.paslists.rys.test_support.ValidationVerification;
+import com.paslists.rys.test_support.Validations;
 import io.jmix.core.DataManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class ProductValidationTest {
@@ -19,7 +14,7 @@ class ProductValidationTest {
     DataManager dataManager;
 
     @Autowired
-    ValidationVerification<Product> validationVerification;
+    Validations<Product> validations;
     private Product product;
 
     @BeforeEach
@@ -34,12 +29,9 @@ class ProductValidationTest {
 
         product.setName("validName");
 
-        // when
-        List<ValidationVerification.ValidationResult<Product>> violations = validationVerification.validate(product);
-
         // then
 
-        assertThat(violations).isEmpty();
+        validations.assertNoViolations(product);
 
     }
 
@@ -50,13 +42,9 @@ class ProductValidationTest {
 
         product.setName(null);
 
-        // when
-        List<ValidationVerification.ValidationResult<Product>> violations = validationVerification.validate(product);
-
         // then
 
-        assertThat(violations).hasSize(1);
-
+        validations.assertOneViolationWith(product, "name", "NotNull");
     }
 
 }

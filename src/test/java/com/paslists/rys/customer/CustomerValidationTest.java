@@ -1,15 +1,11 @@
 package com.paslists.rys.customer;
 
-import com.paslists.rys.test_support.ValidationVerification;
+import com.paslists.rys.test_support.Validations;
 import io.jmix.core.DataManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 class CustomerValidationTest {
@@ -18,7 +14,7 @@ class CustomerValidationTest {
     DataManager dataManager;
 
     @Autowired
-    ValidationVerification<Customer> validationVerification;
+    Validations<Customer> validations;
     private Customer customer;
 
     @BeforeEach
@@ -28,38 +24,21 @@ class CustomerValidationTest {
     }
 
     @Test
+    void given_validCustomer_when_validateCustomer_then_noViolationsOccur() {
+        customer.setEmail("test@noemail.com");
+
+        validations.assertNoViolations(customer);
+    }
+    @Test
     void given_customerWithInvalidEmail_when_validateCustomer_then_oneViolationOccurs() {
 
         // given
 
         customer.setEmail("invalidEmailAddress");
 
-        // when
-        List<ValidationVerification.ValidationResult<Customer>> violations = validationVerification.validate(customer);
-
         // then
 
-        assertThat(violations).hasSize(1);
-
-    }
-
-    @Test
-    void given_customerWithInvalidEmail_when_validateCustomer_then_customerIsInvalidBecauseOfEmail() {
-
-        // given
-
-        customer.setEmail("invalidEmailAddress");
-
-        // when
-        ValidationVerification.ValidationResult<Customer> streetViolation = validationVerification.validateFirst(customer);
-
-        // then
-
-        assertThat(streetViolation.getAttribute()).
-                isEqualTo("email");
-
-        assertThat(streetViolation.getErrorType()).
-                isEqualTo(validationVerification.validationMessage("Email"));
+        validations.assertOneViolationWith(customer, "email", "Email");
     }
 
 }
